@@ -1,0 +1,45 @@
+/* Убрали ВСЕ стили для .navbar */
+
+.homepage {
+  height: 100vh;
+  overflow: hidden; /* Чтобы видео не вылезало за пределы экрана */
+}
+
+.homepage-video-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.homepage-video-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Это более современный и надежный способ */
+  z-index: -2;
+}
+
+/* Улучшение: добавляем легкое затемнение, чтобы текст всегда был читаемым */
+.video-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4); /* Черный с 40% прозрачности */
+  z-index: -1;
+}
+
+.homepage-content {
+  position: relative; /* Чтобы контент был поверх оверлея */
+  z-index: 1;
+  /* Улучшение: добавляем тень к тексту для контрастности */
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+}

@@ -1,0 +1,36 @@
+/* Задаем общий фон для страницы, чтобы карточка выделялась */
+.book-detail-page {
+    background-color: #f8f9fa; /* Светло-серый фон, как у Bootstrap */
+    min-height: 100vh;
+}
+
+/* Стили для главного изображения книги */
+.book-main-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px; /* Скругляем углы */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Добавляем легкую тень */
+    transition: transform 0.3s ease-in-out;
+}
+
+.book-main-image:hover {
+    transform: scale(1.03); /* Немного увеличиваем при наведении */
+}
+
+/* Стилизация текста в ListGroup для метрик */
+.list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1rem;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.list-group-item strong {
+    color: #333;
+}
+
+.details-container-margin {
+    margin-top: 6rem; /* 8rem - это примерно 128px. Можете поставить любое значение: 100px, 10rem и т.д. */
+}

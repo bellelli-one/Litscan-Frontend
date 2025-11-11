@@ -1,0 +1,115 @@
+/* .books-page {
+    background-color: #EEECEC;
+    min-height: 100vh;
+}
+
+.books-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* .brand {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-decoration: none;
+    margin-left: 100px;
+    color: #111;
+} 
+
+.search-and-cart-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: #fff;
+    border: 3px solid #ccc;
+    border-radius: 8px;
+    padding: 0;
+    height: 40px;
+    width: 100%;
+    max-width: 1000px;
+    margin: 40px auto;
+}
+
+.search-input {
+    border: none !important;
+    outline: none !important;
+    padding: 8px 12px;
+    font-size: 14px;
+    flex: 1;
+    background: transparent;
+}
+
+.search-input:focus {
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.cart-wrapper {
+    position: relative;
+    flex-shrink: 0;
+    margin-right: 10px;
+}
+
+.cart-indicator {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+}
+
+.books-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 130px;
+    margin: 40px auto;
+    max-width: 1300px;
+} */
+
+/* Стили для бренда в хедере */
+.brand {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #111 !important;
+}
+
+/* Декоративная линия, как в примере */
+.header-line {
+    border: none;
+    border-top: 1px solid #ccc;
+    width: calc(100% - 40px);
+    margin: 1rem auto 2rem auto;
+}
+
+/* Обертка для позиционирования значка корзины */
+.cart-wrapper {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 1000;
+}
+
+.cart-image {
+    width: 70px;
+    height: 70px;
+    border-radius: 6px;
+}
+
+/* Позиционируем значок-счетчик */
+.cart-indicator {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    border: 2px solid white;
+    font-size: 14px;
+}

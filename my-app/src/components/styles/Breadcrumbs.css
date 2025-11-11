@@ -1,0 +1,33 @@
+/* styles/Breadcrumbs.css */
+
+.custom-breadcrumbs {
+  /* Убираем стандартный фон Bootstrap, если он есть */
+  background-color: transparent;
+  padding: 0;
+  font-size: 1rem; /* Немного увеличим шрифт */
+}
+
+/* Стилизуем ссылки в "крошках" */
+.custom-breadcrumbs .breadcrumb-item a {
+  color: #0d6efd; /* Стандартный синий цвет для ссылок Bootstrap */
+  font-weight: 500;
+  text-decoration: none; /* Убираем подчеркивание */
+  transition: color 0.2s ease-in-out;
+}
+
+.custom-breadcrumbs .breadcrumb-item a:hover {
+  color: #0a58ca; /* Затемняем ссылку при наведении */
+}
+
+/* Стилизуем активную (последнюю) "крошку" */
+.custom-breadcrumbs .breadcrumb-item.active {
+  color: #6c757d; /* Делаем ее серой, чтобы показать, что это не ссылка */
+  font-weight: 500;
+}
+
+/* Стилизуем разделитель (знак ">") */
+.custom-breadcrumbs .breadcrumb-item + .breadcrumb-item::before {
+  color: #6c757d; /* Делаем разделитель серым */
+  padding-right: 0.75rem; /* Немного увеличим отступ */
+  padding-left: 0.75rem;
+}

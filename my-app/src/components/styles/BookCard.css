@@ -1,0 +1,46 @@
+.book-card {
+    /* Задаем размеры и базовые стили */
+    width: 530px;
+    height: 530px; /* Фиксированная высота, как в вашем примере */
+
+    /* Анимация при наведении остается, так как это кастомный эффект */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.book-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15); /* Делаем тень более выразительной */
+}
+
+.book-card-img {
+    width: 100%;
+    height: 100%; /* Растягиваем на всю высоту колонки */
+    object-fit: cover; /* Сохраняем пропорции, обрезая лишнее */
+    border-radius: 8px;
+}
+
+/* Ограничиваем текст описания несколькими строками */
+.book-card-description {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 5; /* Можно настроить количество строк */
+    -webkit-box-orient: vertical;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: #333;
+}
+
+/* Стили для маркеров (остаются без изменений) */
+.book-card-markers {
+    margin-bottom: 10px; /* Немного уменьшим отступ */
+}
+
+.marker-item {
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    line-height: 1.3;
+}
+
+.marker-item strong {
+    color: #111;
+}
