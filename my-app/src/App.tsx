@@ -13,9 +13,14 @@ const MainLayout = () => (
     </>
 );
 
+const isTauri = typeof window !== 'undefined' && (window as any).__TAURI__;
+
+    // Если Tauri -> корень '/', иначе -> ваш репозиторий
+const basename = isTauri ? '/' : '/Litscan-Frontend';
+
 function App() {
     return (
-        <BrowserRouter>
+        <BrowserRouter basename={basename}>
             <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route element={<MainLayout />}>

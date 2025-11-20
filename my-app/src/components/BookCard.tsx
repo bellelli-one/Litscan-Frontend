@@ -3,16 +3,13 @@ import { LinkContainer } from 'react-router-bootstrap';
 import type { IBook } from '../types';
 import './styles/BookCard.css';
 
-export const DefaultImage = 'http://172.18.0.4:9000/test/default-book.jpg';
+export const DefaultImage = 'http://172.18.0.5:9000/test/default-book.jpg';
 
 interface BookCardProps {
     book: IBook;
 }
 
 export const BookCard: React.FC<BookCardProps> = ({ book }) => {
-    // Важно: Также убедитесь, что ваш тип IBook соответствует snake_case
-    // или используйте // @ts-ignore перед строками с ошибками, если не хотите менять тип
-
     return (
         <Card className="book-card h-100">
             <Card.Body className="d-flex flex-column">
@@ -53,12 +50,12 @@ export const BookCard: React.FC<BookCardProps> = ({ book }) => {
                 </div>
 
                 <div className="d-flex gap-2 mt-3">
-                    <Button 
+                    {/* <Button 
                         variant="primary"
                         className="w-100"
                     >
                         Добавить
-                    </Button>
+                    </Button> */}
                     
                     <LinkContainer to={`/book/${book.id}`}>
                         <Button 

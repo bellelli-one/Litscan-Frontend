@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { Container, Spinner, Row, Col, Card, Image, Button, ListGroup, Breadcrumb } from 'react-bootstrap';
+import { useParams} from 'react-router-dom';
+import { Container, Spinner, Row, Col, Card, Image, Button, ListGroup} from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Breadcrumbs } from '../components/Breadcrumbs';
 import { getBookById } from '../api/booksApi.ts';

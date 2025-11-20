@@ -26,3 +26,15 @@ export interface ICartBadge {
   appl_id: number | null;
   count: number;
 }
+
+export interface BreadcrumbsProps {
+  crumbs: ICrumb[];
+}
+
+export interface bookCardProps {
+    factor: IBook;
+}
+
+export interface FilterState {
+    searchTerm: string;
+}

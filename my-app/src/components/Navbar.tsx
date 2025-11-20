@@ -1,13 +1,10 @@
 import { Navbar, Container, Nav } from 'react-bootstrap';
-// 1. Импортируем LinkContainer, как мы делали раньше
 import { LinkContainer } from 'react-router-bootstrap';
 
-// 2. Импортируем наши новые стили
 import './styles/Navbar.css';
 
 export const AppNavbar = () => {
   return (
-    // 3. Добавляем наш класс для точных отступов и убираем `fluid` из Container
     <Navbar fixed="top" className="shadow-sm navbar-custom-padding">
       <Container>
         {/* 4. Оборачиваем бренд в LinkContainer */}
