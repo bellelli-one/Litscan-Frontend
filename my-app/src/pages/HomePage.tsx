@@ -1,7 +1,7 @@
 import { AppNavbar } from '../components/Navbar';
 import { Container } from 'react-bootstrap'; // Используем Container для консистентности
 import './styles/HomePage.css';
-import videoBackground from '/background/books-background.mp4';
+import videoBackground from '/background/books-background.webm';
 
 export const HomePage = () => {
     return (
@@ -11,7 +11,7 @@ export const HomePage = () => {
 
             <div className="homepage-video-container">
                 <video autoPlay loop muted playsInline className="homepage-video-background">
-                    <source src={videoBackground} type="video/mp4" />
+                    <source src={videoBackground} type="video/webm" />
                     Ваш браузер не поддерживает видео-тег.
                 </video>
                 
