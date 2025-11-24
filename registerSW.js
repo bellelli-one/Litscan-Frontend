@@ -1,1 +1,1 @@
-if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/RepoName/sw.js', { scope: '/RepoName/' })})}
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/Litscan-Frontend/sw.js', { scope: '/Litscan-Frontend/' })})}
