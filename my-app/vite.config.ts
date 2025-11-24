@@ -6,9 +6,8 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 
 export default defineConfig(({ command }) => {
-  const isTauri = process.env.TAURI_ENV_PLATFORM !== undefined;
 
-  const base = (command === 'build' && !isTauri) ? '/RepoName/' : '/';
+  const base = command === 'build' ? '/Litscan-Frontend/' : '/'; 
   return {
     base: base,
     plugins: [
