@@ -1,13 +1,15 @@
 import type { IPaginatedBooks, IBook, ICartBadge } from '../types';
 import { BOOKS_MOCK } from './mock.ts';
+import { getApiBase } from '../config';
 
-const API_PREFIX = '/api';
+const API_BASE = getApiBase();
+
 
 // Получение списка книг с фильтрацией по названию
 export const getBooks = async (searchQuery: string): Promise<IPaginatedBooks> => {
     const url = searchQuery 
-        ? `${API_PREFIX}/books?title=${encodeURIComponent(searchQuery)}`
-        : `${API_PREFIX}/books`;
+        ? `${API_BASE}/books?title=${encodeURIComponent(searchQuery)}`
+        : `${API_BASE}/books`;
 
     try {
         const response = await fetch(url);
@@ -31,7 +33,7 @@ export const getBooks = async (searchQuery: string): Promise<IPaginatedBooks> =>
 // Получение одной книги по ID
 export const getBookById = async (id: string): Promise<IBook | null> => {
     try {
-        const response = await fetch(`${API_PREFIX}/books/${id}`);
+        const response = await fetch(`${API_BASE}/books/${id}`);
         if (!response.ok) {
             throw new Error('Backend is not available');
         }
@@ -51,7 +53,7 @@ export const getCartBadge = async (): Promise<ICartBadge> => {
             throw new Error('No auth token found');
         }
 
-        const response = await fetch(`${API_PREFIX}/order/cartbadge`, {
+        const response = await fetch(`${API_BASE}/order/cartbadge`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
