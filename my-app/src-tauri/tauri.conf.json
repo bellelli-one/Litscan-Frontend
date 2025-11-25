@@ -37,6 +37,8 @@
   "plugins": {
     "http": {
       "scope": [
+        "http://192.168.1.151:8090/*",
+        "http://192.168.1.151:9000/*",
         "http://localhost:8090/*",
         "http://localhost:9000/*"
       ]

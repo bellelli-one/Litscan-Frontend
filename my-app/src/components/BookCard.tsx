@@ -3,7 +3,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import type { IBook } from '../types';
 import './styles/BookCard.css';
 
-export const DefaultImage = 'http://172.18.0.5:9000/test/default-book.jpg';
+export const DefaultImage = 'mock_images/default-book.jpg';
 
 interface BookCardProps {
     book: IBook;

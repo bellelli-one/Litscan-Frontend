@@ -9,7 +9,7 @@ export interface IBook {
     id: number;
     title: string;
     text: string;
-    image: string;
+    image?: string;
     status: boolean;
     avg_word_len: number;         // <-- Исправлено
     lexical_diversity: number;   // <-- Исправлено

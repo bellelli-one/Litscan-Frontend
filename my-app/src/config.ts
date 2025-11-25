@@ -1,19 +1,24 @@
+// config.ts
+
 // IP вашего Go бэкенда.
-const BACKEND_IP = 'http://localhost:8090'; 
-const MINIO_IP = 'http://localhost:9000';
+const BACKEND_IP = 'http://192.168.1.151:8090'; 
+const MINIO_IP = 'http://192.168.1.151:9000';
 
 export const getApiBase = (): string => {
-    // @ts-ignore
-    const isTauri = !!window.__TAURI__;
+    // Vite предоставляет надежный флаг import.meta.env.DEV
+    // Он true при 'npm run tauri dev' и false при 'npm run tauri build'
+    if (import.meta.env.DEV) {
+        return '/api';
+    }
 
-    // Если Tauri - полный путь (прокси в сборке нет).
-    // Если браузер - относительный путь (работает через прокси Vite).
-    return isTauri ? `${BACKEND_IP}/api` : '/api';
+    // В сборке (build) всегда возвращаем полный путь
+    return `${BACKEND_IP}/api`;
 };
 
 export const getImageBase = (): string => {
-    // @ts-ignore
-    const isTauri = !!window.__TAURI__;
-    // Картинки всегда забираем по полному пути
-    return isTauri ? `${MINIO_IP}` : 'http://localhost:9000';
+    if (import.meta.env.DEV) {
+        return '/img';
+    }
+    // В сборке прямой путь
+    return MINIO_IP;
 };
