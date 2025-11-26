@@ -5,17 +5,17 @@ import './styles/Navbar.css';
 
 export const AppNavbar = () => {
   return (
-    <Navbar fixed="top" className="shadow-sm navbar-custom-padding">
+    // Убрали shadow-sm, так как у нас будет свой бордер и размытие
+    <Navbar fixed="top" className="navbar-custom">
       <Container>
-        {/* 4. Оборачиваем бренд в LinkContainer */}
         <LinkContainer to="/">
           <Navbar.Brand className="brand">L I T S C A N</Navbar.Brand>
         </LinkContainer>
 
         <Nav className="ms-auto">
-          {/* 5. Оборачиваем ссылку на книги в LinkContainer */}
           <LinkContainer to="/books">
-            <Nav.Link className="fs-5 text-dark">Книги</Nav.Link>
+            {/* Добавили класс для стилизации ссылки */}
+            <Nav.Link className="nav-link-custom">Книги</Nav.Link>
           </LinkContainer>
         </Nav>
       </Container>

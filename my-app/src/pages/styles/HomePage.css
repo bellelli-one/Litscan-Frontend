@@ -1,8 +1,7 @@
-/* Убрали ВСЕ стили для .navbar */
-
 .homepage {
   height: 100vh;
-  overflow: hidden; /* Чтобы видео не вылезало за пределы экрана */
+  overflow: hidden;
+  position: relative;
 }
 
 .homepage-video-container {
@@ -22,24 +21,70 @@
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Это более современный и надежный способ */
+  object-fit: cover;
   z-index: -2;
 }
 
-/* Улучшение: добавляем легкое затемнение, чтобы текст всегда был читаемым */
+/* Улучшенный оверлей с градиентом вместо сплошного цвета */
 .video-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.4); /* Черный с 40% прозрачности */
+  /* Градиент от прозрачного сверху к темному снизу для лучшего чтения текста */
+  background: linear-gradient(
+    to bottom, 
+    rgba(0, 0, 0, 0.3) 0%, 
+    rgba(0, 0, 0, 0.7) 100%
+  );
   z-index: -1;
 }
 
 .homepage-content {
-  position: relative; /* Чтобы контент был поверх оверлея */
+  position: relative;
   z-index: 1;
-  /* Улучшение: добавляем тень к тексту для контрастности */
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+  max-width: 900px; /* Ограничиваем ширину, чтобы текст не растягивался слишком сильно */
+}
+
+/* Стилизация заголовка */
+.animate-title {
+    font-family: 'Josefin Sans', sans-serif; /* Используем тот же шрифт, что и в лого */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    
+    /* Анимация */
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease-out forwards;
+    animation-delay: 0.2s; /* Небольшая задержка после загрузки */
+}
+
+/* Выделение бренда в заголовке */
+.highlight-brand {
+    font-weight: 800; /* Жирнее */
+    color: #f8f9fa; /* Чуть ярче белого */
+}
+
+/* Стилизация подзаголовка */
+.animate-subtitle {
+    font-weight: 300;
+    line-height: 1.6;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    opacity: 0.9;
+    
+    /* Анимация */
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease-out forwards;
+    animation-delay: 0.6s; /* Появляется после заголовка */
+}
+
+/* Ключевые кадры анимации (появление снизу вверх) */
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

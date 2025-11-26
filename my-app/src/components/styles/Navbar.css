@@ -1,25 +1,52 @@
-/* Этот класс добавим к компоненту Navbar для точной настройки отступов */
-.navbar-custom-padding {
+/* Эффект матового стекла (Glassmorphism) */
+.navbar-custom {
     padding-top: 20px;
     padding-bottom: 20px;
     padding-left: 40px;
     padding-right: 40px;
-    background-color: #ffffff; /* Белый фон, как в оригинале */
+    
+    /* Полупрозрачный белый фон */
+    background-color: rgba(255, 255, 255, 0.75);
+    /* Размытие фона за навбаром */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    /* Тонкая линия снизу для акцента */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
 }
 
-/* Ваш фирменный стиль бренда LITSCAN */
 .brand {
-    font-family: 'Josefin Sans', sans-serif; /* Убедитесь, что шрифт подключен */
+    font-family: 'Josefin Sans', sans-serif;
     font-size: 28px;
     font-weight: 700;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.25em; /* Чуть шире для премиальности */
     text-transform: uppercase;
     text-decoration: none;
-    margin-left: 10px;
-    color: #111 !important; /* !important нужен, чтобы перебить стандартный цвет ссылки */
+    color: #1a1a1a !important;
 }
 
-/* Стилизация ссылок в навигации для соответствия общему виду */
-.nav-link.fs-5.text-dark:hover {
-    color: #000 !important; /* Делаем текст чернее при наведении */
+/* Стили ссылки */
+.nav-link-custom {
+    font-family: 'Josefin Sans', sans-serif; /* Единый стиль шрифтов */
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #1a1a1a !important;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+/* Красивое подчеркивание при наведении */
+.nav-link-custom::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #1a1a1a;
+    transition: width 0.3s ease;
+}
+
+.nav-link-custom:hover::after {
+    width: 100%;
 }
