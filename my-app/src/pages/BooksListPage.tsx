@@ -102,7 +102,7 @@ export const BooksListPage = () => {
             <div className="cart-wrapper">
                 <a href={isCartActive ? `/order/${cartBadge.appl_id}` : undefined} style={{ cursor: isCartActive ? 'pointer' : 'not-allowed' }}>
                     <Image 
-                        src="http://172.18.0.4:9000/test/book.jpg" 
+                        src="mock_images/book.jpg" 
                         alt="Корзина" 
                         className="cart-image" 
                         style={{ opacity: isCartActive ? 1 : 0.5 }}
