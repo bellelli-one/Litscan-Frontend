@@ -15,8 +15,9 @@ const MainLayout = () => (
 
 const isTauri = typeof window !== 'undefined' && (window as any).__TAURI__;
 
-    // Если Tauri -> корень '/', иначе -> ваш репозиторий
-const basename = isTauri ? '/' : '/Litscan-Frontend';
+const isDev = import.meta.env.DEV;
+
+const basename = (isTauri || isDev) ? '/' : '/Litscan-Frontend';
 
 function App() {
     return (
