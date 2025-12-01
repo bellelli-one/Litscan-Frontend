@@ -1,54 +1,52 @@
-import { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-// Импортируем компоненты из react-bootstrap
+import React, { useEffect } from 'react';
 import { Container, Row, Col, Spinner, Form, Badge, Image, Button, InputGroup, Navbar } from 'react-bootstrap';
-import { BookCard } from '../components/BookCard';
-import { getBooks, getCartBadge } from '../api/booksApi';
-import type { IBook, ICartBadge } from '../types';
-// Стили теперь будут совсем маленькими
-import type { AppDispatch } from '../store';
+// Redux
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { fetchBooks } from '../store/slices/booksSlice';
+import { fetchCartBadge } from '../store/slices/cartSlice';
 import { setSearchTerm, selectSearchTerm } from '../store/slices/filterSlice';
-import './styles/BooksListPage.css';
+import type { AppDispatch, RootState } from '../store';
+// Компоненты
+import { BookCard } from '../components/BookCard';
 import { Breadcrumbs } from '../components/Breadcrumbs';
+// Стили
+import './styles/BooksListPage.css';
 
 export const BooksListPage = () => {
-    const [books, setBooks] = useState<IBook[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [cartBadge, setCartBadge] = useState<ICartBadge>({ appl_id: null, count: 0 });
     const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
+
+    // 1. Получаем данные из Redux (вместо useState)
+    const { items: books, loading } = useSelector((state: RootState) => state.books);
     const searchTerm = useSelector(selectSearchTerm);
+    const cartState = useSelector((state: RootState) => state.cart);
 
-    const fetchBooks = (searchQuery: string) => {
-        setLoading(true);
-        getBooks(searchQuery)
-            .then(data => {
-                if (Array.isArray(data.items)) {
-                    setBooks(data.items);
-                } else {
-                    console.error("Получены неверные данные:", data);
-                    setBooks([]);
-                }
-            })
-            .catch(err => {
-                console.error("Ошибка при загрузке книг:", err);
-                setBooks([]);
-            })
-            .finally(() => setLoading(false));
-    };
+    // Логика активности корзины (проверяем application_id)
+    const isCartActive = cartState.count > 0 && cartState.application_id !== null;
 
-   useEffect(() => {
-        fetchBooks(searchTerm);
-        getCartBadge().then(cartData => {
-            setCartBadge(cartData);
-        });
-    }, []);
+    // 2. Загружаем данные при открытии страницы (Thunks)
+    useEffect(() => {
+        // Если при переходе назад searchTerm остался, загрузятся отфильтрованные книги
+        dispatch(fetchBooks(searchTerm));
+        // Обновляем бейджик корзины
+        dispatch(fetchCartBadge());
+    }, [dispatch]); // Запускаем 1 раз при монтировании
 
+    // Обработка поиска
     const handleSearchSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        fetchBooks(searchTerm);
+        dispatch(fetchBooks(searchTerm));
     };
 
-    const isCartActive = cartBadge.count > 0 && cartBadge.appl_id !== null;
+    // Переход в корзину/заявку
+    const handleCartClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        if (isCartActive && cartState.application_id) {
+            navigate(`/applications/${cartState.application_id}`);
+        }
+    };
+
     const crumbsForServices = [
         { label: 'Главная', path: '/' },
         { label: 'Каталог книг' }
@@ -56,6 +54,7 @@ export const BooksListPage = () => {
 
     return (
         <div>
+            {/* Навбар оставил твой, он красивый */}
             <Navbar bg="white" expand="lg" className="shadow-sm">
                 <Container>
                     <Navbar.Brand href="/" className="brand">L I T S C A N</Navbar.Brand>
@@ -74,7 +73,7 @@ export const BooksListPage = () => {
                                     type="search"
                                     placeholder="Введите произведение для поиска..."
                                     value={searchTerm}
-                                    // Исправлено: теперь ввод в строку поиска будет работать
+                                    // Изменяем состояние в Redux при вводе
                                     onChange={(e) => dispatch(setSearchTerm(e.target.value))}
                                 />
                                 <Button variant="dark" type="submit" disabled={loading}>
@@ -86,31 +85,43 @@ export const BooksListPage = () => {
                 </Form>
 
                 {loading ? (
-                    <div className="text-center"><Spinner animation="border" variant="primary" /></div>
+                    <div className="text-center mt-5">
+                        <Spinner animation="border" variant="dark" />
+                    </div>
                 ) : (
-                    <Row xs={1} md={2} lg={2} className="g-5 justify-content-center">
+                    <Row xs={1} md={2} lg={2} className="g-5">
                         {books.map(book => (
-                            <Col key={book.id} className="d-flex justify-content-center">
+                            <Col key={book.id}>
                                 <BookCard book={book} />
                             </Col>
                         ))}
+                        {books.length === 0 && (
+                            <Col xs={12} className="text-center mt-5">
+                                <p className="text-muted">Книги не найдены</p>
+                            </Col>
+                        )}
                     </Row>
                 )}
             </Container>
 
-            {/* --- ВОЗВРАЩЕНА ВАША ВЕРСИЯ КОРЗИНЫ --- */}
+            {/* Плавающая корзина (логика из Redux, стиль твой) */}
             <div className="cart-wrapper">
-                <a href={isCartActive ? `/order/${cartBadge.appl_id}` : undefined} style={{ cursor: isCartActive ? 'pointer' : 'not-allowed' }}>
+                <div 
+                    onClick={handleCartClick} 
+                    style={{ cursor: isCartActive ? 'pointer' : 'not-allowed', position: 'relative', display: 'inline-block' }}
+                >
                     <Image 
                         src="mock_images/book.jpg" 
                         alt="Корзина" 
                         className="cart-image" 
                         style={{ opacity: isCartActive ? 1 : 0.5 }}
                     />
-                    <Badge pill bg="primary" className="cart-indicator">
-                        {cartBadge.count || 0}
-                    </Badge>
-                </a>
+                    {isCartActive && (
+                        <Badge pill bg="dark" className="cart-indicator">
+                            {cartState.count}
+                        </Badge>
+                    )}
+                </div>
             </div>
         </div>
     );

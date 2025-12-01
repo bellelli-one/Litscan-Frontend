@@ -1,0 +1,111 @@
+/* --- Стили для страницы авторизации/регистрации --- */
+
+/* Фон страницы - легкий серый или градиент, чтобы было видно эффект стекла */
+.auth-page-wrapper {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    /* Или просто белый, если хотите минимализм: background-color: #fcfcfc; */
+}
+
+/* Карточка с эффектом матового стекла (как navbar-custom) */
+.auth-card {
+    background-color: rgba(255, 255, 255, 0.65); /* Более прозрачный, чем навбар */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.4); /* Тонкая белая рамка */
+}
+
+/* Заголовок в стиле бренда */
+.auth-title {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #111;
+    margin-bottom: 0.5rem;
+}
+
+/* Кастомизация полей ввода */
+.auth-input {
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid #e0e0e0;
+    font-family: 'Josefin Sans', sans-serif;
+    color: #333;
+    border-radius: 8px;
+}
+
+/* Эффект фокуса для инпутов - черная обводка вместо синей */
+.auth-input:focus {
+    border-color: #333;
+    box-shadow: 0 0 0 0.25rem rgba(50, 50, 50, 0.1);
+    background-color: #fff;
+}
+
+/* Плавающий лейбл */
+.form-floating > label {
+    font-family: 'Josefin Sans', sans-serif;
+    color: #666;
+}
+
+/* Кнопка */
+.auth-btn {
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    background-color: #1a1a1a;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.auth-btn:hover:not(:disabled) {
+    background-color: #333;
+    transform: translateY(-2px); /* Легкий подъем, как у карточек книг */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.auth-btn:disabled {
+    background-color: #666;
+}
+
+/* Ссылка "Войти" */
+.auth-link {
+    color: #1a1a1a;
+    transition: color 0.3s ease;
+    position: relative;
+}
+
+/* Подчеркивание ссылки при наведении (как в навбаре) */
+.auth-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 1px;
+    bottom: -2px;
+    left: 0;
+    background-color: #1a1a1a;
+    transition: width 0.3s ease;
+}
+
+.auth-link:hover::after {
+    width: 100%;
+}
+
+.auth-footer-text {
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 0.95rem;
+}
+
+/* Стиль для заблокированного поля (режим просмотра профиля) */
+.auth-input:disabled {
+    background-color: rgba(255, 255, 255, 0.4); /* Прозрачность */
+    color: #555; /* Цвет текста чуть темнее, чтобы читалось */
+    border-color: transparent; /* Убираем рамку в режиме просмотра */
+    font-weight: 500;
+}
+
+/* При наведении на кнопки outline в профиле */
+.btn-outline-dark:hover {
+    background-color: #1a1a1a;
+    color: white;
+}

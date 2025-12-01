@@ -1,26 +1,28 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams} from 'react-router-dom';
 import { Container, Spinner, Row, Col, Card, Image, Button, ListGroup} from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Breadcrumbs } from '../components/Breadcrumbs';
-import { getBookById } from '../api/booksApi.ts';
-import type { IBook } from '../types';
-import { AppNavbar } from '../components/Navbar'; // 1. Импортируем общий Navbar
+import { AppNavbar } from '../components/Navbar';
+import { useSelector, useDispatch } from 'react-redux';
+import {fetchBookById, clearCurrentBook} from '../store/slices/booksSlice.ts'
+import type {RootState, AppDispatch} from '../store'
 import './styles/BookDetailPage.css'; // Наш новый, маленький CSS
 
 export const BookDetailPage = () => {
     const { id } = useParams<{ id: string }>();
-    const [book, setBook] = useState<IBook | null>(null);
-    const [loading, setLoading] = useState(true);
+    const dispatch = useDispatch<AppDispatch>();
+    const { currentBook: book, loading } = useSelector((state: RootState) => state.books);
 
     useEffect(() => {
         if (id) {
-            setLoading(true);
-            getBookById(id)
-                .then(data => setBook(data))
-                .finally(() => setLoading(false));
+            dispatch(fetchBookById(id));
         }
-    }, [id]);
+        // Очистка при уходе со страницы (как у друга)
+        return () => {
+            dispatch(clearCurrentBook());
+        };
+    }, [id, dispatch]);
 
     // Состояние загрузки
     if (loading) {

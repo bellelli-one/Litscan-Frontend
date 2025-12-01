@@ -1,18 +1,36 @@
 import { AppNavbar } from '../components/Navbar';
 import { Container } from 'react-bootstrap';
 import './styles/HomePage.css';
-import videoBackground from '/background/books-background.mp4';
+import videoSource from '../assets/books-background.mp4';
+import imageSource from '../assets/books-background.png';
 
 export const HomePage = () => {
+    const isDev = import.meta.env.DEV;  
     return (
         <div className="homepage"> 
             <AppNavbar />
 
             <div className="homepage-video-container">
-                <video autoPlay loop muted playsInline className="homepage-video-background">
-                    <source src={videoBackground} type="video/mp4" />
-                    Ваш браузер не поддерживает видео-тег.
-                </video>
+                {isDev ? (
+                    // В режиме разработки показываем ВИДЕО
+                    <video 
+                        autoPlay 
+                        loop 
+                        muted 
+                        playsInline 
+                        className="homepage-video-background"
+                    >
+                        <source src={videoSource} type="video/mp4" />
+                    </video>
+                ) : (
+                    // В билде (Tauri/GitHub) показываем КАРТИНКУ
+                    // Класс используем тот же, чтобы она растягивалась так же, как видео
+                    <img 
+                        src={imageSource} 
+                        alt="Background" 
+                        className="homepage-video-background" 
+                    />
+                )}
                 
                 <div className="video-overlay"></div> 
 
