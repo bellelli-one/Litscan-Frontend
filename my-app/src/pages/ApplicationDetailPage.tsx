@@ -27,7 +27,6 @@ export const ApplicationDetailPage = () => {
     
     const { currentOrder, loading, operationSuccess } = useSelector((state: RootState) => state.orders);
     
-    // Поля метрик заявки
     const [formData, setFormData] = useState({
         avg_word_len: 0,
         lexical_diversity: 0,
@@ -47,7 +46,6 @@ export const ApplicationDetailPage = () => {
         }
     }, [id, dispatch]);
 
-    // Заполнение формы при загрузке
     useEffect(() => {
         if (currentOrder) {
             setFormData({
