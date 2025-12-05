@@ -2,8 +2,8 @@ const target_tauri = typeof window !== 'undefined' && (window as any).__TAURI__;
 // Проверяем, находимся ли мы в режиме продакшена (финальной сборки)
 const is_production = import.meta.env.PROD; 
 
-export const api_proxy_addr = "http://192.168.1.151:8090"; // Ваш IP
-export const img_proxy_addr = "http://192.168.1.151:9000"; // Ваш IP
+export const api_proxy_addr = "http://192.168.1.151"; // Ваш IP
+export const img_proxy_addr = "http://192.168.1.151"; // Ваш IP
 
 // --- ГЛАВНОЕ ИЗМЕНЕНИЕ ЗДЕСЬ ---
 

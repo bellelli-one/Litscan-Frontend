@@ -11,8 +11,8 @@ import {
     deleteOrder,
     resetOperationSuccess,
     clearCurrentOrder
-} from '../store/slices/analysebooksSlice'; // Убедись, что путь верный (ordersSlice или analysebooksSlice)
-import { Trash, CheckCircleFill, ExclamationCircle, BarChartLine, Floppy } from 'react-bootstrap-icons';
+} from '../store/slices/analysebooksSlice';
+import { Trash, CheckCircleFill, BarChartLine, Floppy, ExclamationCircle } from 'react-bootstrap-icons';
 import type { AppDispatch, RootState } from '../store';
 import './styles/main.css';
 
@@ -105,7 +105,6 @@ export const ApplicationDetailPage = () => {
         }
     };
 
-    // Сохранение "молча" при уходе с поля (оставляем для удобства)
     const handleDescBlur = (bookId: number) => {
         if(currentOrder.id && descriptions[bookId] !== undefined) {
             dispatch(updateBookDescription({
@@ -116,7 +115,6 @@ export const ApplicationDetailPage = () => {
         }
     };
 
-    // --- НОВАЯ ФУНКЦИЯ: Сохранение по кнопке с уведомлением ---
     const handleManualDescSave = (bookId: number) => {
         if(currentOrder.id && descriptions[bookId] !== undefined) {
             dispatch(updateBookDescription({
@@ -141,12 +139,12 @@ export const ApplicationDetailPage = () => {
                 </Card.Body>
             </Card>
 
-            {/* Блок параметров заявки (верхняя часть) */}
             <Row className="mb-4 g-4">
+                {/* Левая колонка: Ввод метрик */}
                 <Col md={6}>
                     <Card className="h-100 border-0 shadow-sm" style={{ backgroundColor: 'rgba(255,255,255,0.8)' }}>
                         <Card.Body>
-                            <h5 className="fw-bold mb-3" style={{ fontFamily: 'Josefin Sans' }}>Параметры анализа (Общие)</h5>
+                            <h5 className="fw-bold mb-3" style={{ fontFamily: 'Josefin Sans' }}>Параметры анализа (Целевые)</h5>
                             <Form>
                                 <Form.Group as={Row} className="mb-3 align-items-center">
                                     <Form.Label column sm={6} className="text-muted small">Средняя длина слова</Form.Label>
@@ -158,7 +156,6 @@ export const ApplicationDetailPage = () => {
                                         />
                                     </Col>
                                 </Form.Group>
-                                {/* Остальные поля... */}
                                 <Form.Group as={Row} className="mb-3 align-items-center">
                                     <Form.Label column sm={6} className="text-muted small">Лексическое разнообразие</Form.Label>
                                     <Col sm={6}>
@@ -194,26 +191,79 @@ export const ApplicationDetailPage = () => {
                     </Card>
                 </Col>
 
+                {/* Правая колонка: Статус/Результат */}
                 <Col md={6}>
                     <Card className="h-100 border-0 shadow-sm" style={{ backgroundColor: 'rgba(255,255,255,0.8)' }}>
                         <Card.Body className="d-flex flex-column justify-content-center align-items-center text-center">
-                            {isCompleted ? (
-                                <div>
+                            
+                            {isCompleted && (
+                                <div className="w-100">
                                     <BarChartLine size={48} className="text-success mb-3" />
-                                    <h5 className="fw-bold text-success">Анализ завершен</h5>
-                                </div>
-                            ) : (
-                                <div>
-                                    <BarChartLine size={48} className="text-secondary mb-3" />
-                                    <h5 className="fw-bold">Ожидание обработки</h5>
+                                    <h5 className="fw-bold text-success" style={{ fontFamily: 'Josefin Sans' }}>Анализ завершен</h5>
+                                    
+                                    <div className="bg-white p-3 rounded border text-start mt-3 shadow-sm">
+                                        
+                                        {/* === ДОБАВЬ ВОТ ЭТОТ БЛОК === */}
+                                        <div className="text-center mb-3 pb-3 border-bottom">
+                                            <span className="d-block text-muted small text-uppercase mb-1" style={{fontFamily: 'Josefin Sans'}}>
+                                                Итоговый результат
+                                            </span>
+                                            <span className="fs-3 fw-bold text-success" style={{ fontFamily: 'Josefin Sans' }}>
+                                                {/* Выводим текст из базы (например: "Вероятность успеха: 71.39%") */}
+                                                {currentOrder.response || "Данные сохранены"}
+                                            </span>
+                                        </div>
+                                        {/* ============================ */}
+
+                                        <div className="d-flex justify-content-between mb-2 border-bottom pb-2">
+                                            <span className="text-muted small">Лекс. разнообразие:</span>
+                                            <strong>{currentOrder.lexical_diversity?.toFixed(2) || 0}</strong>
+                                        </div>
+                                        <div className="d-flex justify-content-between mb-2 border-bottom pb-2">
+                                            <span className="text-muted small">Ср. длина слова:</span>
+                                            <strong>{currentOrder.avg_word_len?.toFixed(2) || 0}</strong>
+                                        </div>
+                                        <div className="d-flex justify-content-between mb-2 border-bottom pb-2">
+                                            <span className="text-muted small">Частота союзов:</span>
+                                            <strong>{currentOrder.conjunction_freq?.toFixed(2) || 0}</strong>
+                                        </div>
+                                        <div className="d-flex justify-content-between">
+                                            <span className="text-muted small">Ср. длина предл.:</span>
+                                            <strong>{currentOrder.avg_sentence_len?.toFixed(1) || 0}</strong>
+                                        </div>
+                                    </div>
                                 </div>
                             )}
+
+                            {isRejected && (
+                                <div>
+                                    <ExclamationCircle size={48} className="text-danger mb-3" />
+                                    <h5 className="text-danger fw-bold" style={{ fontFamily: 'Josefin Sans' }}>Заявка отклонена</h5>
+                                    <p className="text-muted">
+                                        Модератор отклонил эту заявку. <br/>
+                                        Проверьте список книг и примечания к ним на соответствие правилам.
+                                    </p>
+                                </div>
+                            )}
+
+                            {!isCompleted && !isRejected && (
+                                <div>
+                                    <BarChartLine size={48} className="text-secondary mb-3" />
+                                    <h5 className="fw-bold" style={{ fontFamily: 'Josefin Sans' }}>Ожидание обработки</h5>
+                                    <p className="text-muted small">
+                                        {isDraft 
+                                            ? "Сформируйте заявку, чтобы отправить её на анализ модератору." 
+                                            : "Заявка находится на проверке у модератора. Ожидайте результатов."
+                                        }
+                                    </p>
+                                </div>
+                            )}
+
                         </Card.Body>
                     </Card>
                 </Col>
             </Row>
 
-            {/* --- СПИСОК КНИГ В ЗАЯВКЕ --- */}
             <h5 className="fw-bold mb-3 mt-4" style={{ fontFamily: 'Josefin Sans' }}>Книги для анализа</h5>
             <div className="d-flex flex-column gap-3 mb-5">
                 {(currentOrder.books || []).length === 0 && (
@@ -236,7 +286,7 @@ export const ApplicationDetailPage = () => {
                                     </div>
                                 </Col>
                                 
-                                {/* Кола 2: Информация */}
+                                {/* Кола 2: Информация (БЕЗ КНОПКИ ПОДРОБНЕЕ) */}
                                 <Col md={6} className="p-3 border-end">
                                     <h6 className="fw-bold m-0 mb-3">{b.title}</h6>
                                     {/* Статистика */}
@@ -249,9 +299,8 @@ export const ApplicationDetailPage = () => {
                                         </Row>
                                     </div>
                                     <div className="d-flex gap-2">
-                                        <Link to={`/books/${b.book_id}`}>
-                                            <Button size="sm" variant="outline-dark">Подробнее</Button>
-                                        </Link>
+                                        {/* Кнопка "Подробнее" УДАЛЕНА */}
+                                        
                                         {isDraft && (
                                             <Button 
                                                 variant="outline-danger" 
@@ -264,7 +313,7 @@ export const ApplicationDetailPage = () => {
                                     </div>
                                 </Col>
 
-                                {/* Кола 3: Примечание (М-М поле) */}
+                                {/* Кола 3: Примечание */}
                                 <Col md={4} className="p-3 bg-white">
                                     <Form.Group>
                                         <Form.Label className="small text-muted mb-1">Примечание</Form.Label>
@@ -280,7 +329,6 @@ export const ApplicationDetailPage = () => {
                                         />
                                     </Form.Group>
 
-                                    {/* --- ВОТ ДОБАВЛЕННАЯ КНОПКА СОХРАНЕНИЯ М-М --- */}
                                     {isDraft && (
                                         <div className="text-end">
                                             <Button 
@@ -300,7 +348,6 @@ export const ApplicationDetailPage = () => {
                 ))}
             </div>
 
-            {/* Нижняя панель действий */}
             {isDraft && (currentOrder.books || []).length > 0 && (
                 <div className="sticky-bottom bg-white border-top p-3 shadow-lg" style={{ bottom: 0, margin: '0 -12px' }}>
                     <Container>

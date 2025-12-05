@@ -27,7 +27,7 @@ export interface DsAnalyseBooksDTO {
   id?: number;
   lexical_diversity?: number;
   moderator_login?: number;
-  responce?: string;
+  response?: string;
   status?: number;
 }
 
@@ -38,9 +38,15 @@ export interface DsAnalyseBooksResolveRequest {
 
 export interface DsAnalyseBooksUpdateRequest {
   avg_sentence_len?: number;
+  /** Новые поля метрик */
   avg_word_len?: number;
+  completion_date?: string;
   conjunction_freq?: number;
+  forming_date?: string;
   lexical_diversity?: number;
+  moderator?: boolean;
+  response?: string;
+  status?: number;
 }
 
 export interface DsBookCreateRequest {
@@ -535,6 +541,31 @@ export class Api<
         method: "PUT",
         body: action,
         secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+  };
+  analysebookscalc = {
+    /**
+     * @description Служебный метод. Принимает JSON с метриками от Python-сервиса и обновляет БД.
+     *
+     * @tags internal
+     * @name AnalysebookscalcUpdate
+     * @summary Принять результаты анализа (Internal)
+     * @request PUT:/analysebookscalc/{id}
+     * @response `200` `Record<string,string>` Updated
+     * @response `400` `Record<string,string>` Bad Request
+     * @response `403` `Record<string,string>` Forbidden
+     */
+    analysebookscalcUpdate: (
+      id: number,
+      input: DsAnalyseBooksUpdateRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<Record<string, string>, Record<string, string>>({
+        path: `/analysebookscalc/${id}`,
+        method: "PUT",
+        body: input,
         type: ContentType.Json,
         ...params,
       }),

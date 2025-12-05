@@ -2,24 +2,32 @@ import React, { useEffect, useState } from 'react';
 import { Container, Table, Form, Row, Col, Badge, Spinner, Card } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { fetchOrdersList } from '../store/slices/analysebooksSlice'; // Используем ordersSlice
+import { fetchOrdersList } from '../store/slices/analysebooksSlice'; 
 import type { AppDispatch, RootState } from '../store';
 import { CalendarEvent, Funnel } from 'react-bootstrap-icons';
 import './styles/main.css';
 
-// Хелпер для статусов (цвета Bootstrap)
+// Получение текущей даты в формате YYYY-MM-DD для инпута
+const getTodayString = () => {
+    const date = new Date();
+    const year = date.getFullYear();
+    // Месяцы в JS идут с 0, поэтому +1. padStart добавляет 0 в начало, если число < 10
+    const month = String(date.getMonth() + 1).padStart(2, '0'); 
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
 const getStatusBadge = (status: number | undefined) => {
     switch (status) {
         case 1: return <Badge bg="secondary" className="px-3 py-2 fw-normal">Черновик</Badge>;
-        case 2: return <Badge bg="dark" className="px-3 py-2 fw-normal">Удалена</Badge>;
-        case 3: return <Badge bg="primary" className="px-3 py-2 fw-normal">Сформирована</Badge>; // или В работе
+        case 2: return <Badge bg="warning" text="dark" className="px-3 py-2 fw-normal">В обработке</Badge>;
+        case 3: return <Badge bg="primary" className="px-3 py-2 fw-normal">Сформирована</Badge>;
         case 4: return <Badge bg="success" className="px-3 py-2 fw-normal">Завершена</Badge>;
         case 5: return <Badge bg="danger" className="px-3 py-2 fw-normal">Отклонена</Badge>;
         default: return <Badge bg="light" text="dark">Неизвестно</Badge>;
     }
 };
 
-// Функция для красивого форматирования даты
 const formatDate = (dateString?: string) => {
     if (!dateString) return <span className="text-muted small">—</span>;
     return new Date(dateString).toLocaleDateString('ru-RU', {
@@ -33,21 +41,30 @@ export const ApplicationsListPage = () => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     
-    // Берем данные из ordersSlice
     const { list, loading } = useSelector((state: RootState) => state.orders);
 
+    // === ИЗМЕНЕНИЕ ЗДЕСЬ ===
+    // Инициализируем фильтры текущей датой
     const [filters, setFilters] = useState({
         status: 'all',
-        from: '',
-        to: ''
+        from: getTodayString(), // Сразу ставим "Сегодня"
+        to: getTodayString()    // И здесь "Сегодня"
     });
 
-    useEffect(() => {
+    const loadData = () => {
         dispatch(fetchOrdersList(filters));
-    }, [dispatch, filters]);
+    };
+
+    // Short Polling
+    useEffect(() => {
+        loadData();
+        const interval = setInterval(() => {
+            loadData(); 
+        }, 5000); 
+        return () => clearInterval(interval);
+    }, [dispatch, filters]); 
 
     const handleRowClick = (id: number | undefined) => {
-        // Переход на страницу деталей заявки
         if (id) navigate(`/applications/${id}`);
     };
 
@@ -55,8 +72,9 @@ export const ApplicationsListPage = () => {
         setFilters({ ...filters, [e.target.name]: e.target.value });
     };
 
+    const isFirstLoading = loading && (!list || list.length === 0);
+
     return (
-        // Используем класс auth-page-wrapper для общего фона, если нужно, или просто белый
         <div className="min-vh-100" style={{ backgroundColor: '#f9f9f9' }}>
             <Container className="pt-5 mt-5 pb-5">
                 <div className="text-center mb-5">
@@ -64,11 +82,10 @@ export const ApplicationsListPage = () => {
                         История заявок
                     </h2>
                     <p className="text-muted" style={{ fontFamily: 'Josefin Sans' }}>
-                        Отслеживайте статус анализа ваших книг
+                        Заявки за сегодня ({formatDate(getTodayString())})
                     </p>
                 </div>
 
-                {/* Карточка фильтров */}
                 <Card className="mb-4 border-0 shadow-sm rounded-4 overflow-hidden">
                      <Card.Body className="p-4 bg-white">
                         <h6 className="fw-bold mb-3 d-flex align-items-center gap-2" style={{ fontFamily: 'Josefin Sans' }}>
@@ -86,7 +103,7 @@ export const ApplicationsListPage = () => {
                                 >
                                     <option value="all">Все заявки</option>
                                     <option value="1">Черновики</option>
-                                    <option value="3">Сформированные</option>
+                                    <option value="2">В обработке</option>
                                     <option value="4">Завершенные</option>
                                     <option value="5">Отклоненные</option>
                                 </Form.Select>
@@ -115,9 +132,10 @@ export const ApplicationsListPage = () => {
                     </Card.Body>
                 </Card>
 
-                {loading ? (
+                {isFirstLoading ? (
                     <div className="text-center py-5">
                         <Spinner animation="border" variant="dark" />
+                        <p className="text-muted mt-2">Загрузка списка...</p>
                     </div>
                 ) : (
                     <Card className="border-0 shadow-sm rounded-4 overflow-hidden">
@@ -159,7 +177,7 @@ export const ApplicationsListPage = () => {
                                         <tr>
                                             <td colSpan={5} className="text-center py-5 text-muted">
                                                 <h5 className="fw-bold" style={{ fontFamily: 'Josefin Sans' }}>Список пуст</h5>
-                                                <p className="small mb-0">У вас пока нет заявок, соответствующих фильтрам.</p>
+                                                <p className="small mb-0">Заявок за выбранный период (сегодня) не найдено.</p>
                                             </td>
                                         </tr>
                                     )}
