@@ -9,7 +9,7 @@ import type { IBook } from '../types';
 import './styles/BookCard.css';
 
 // Путь к заглушке (если нужно, поправь под свой проект)
-export const DefaultImage = '/mock_images/default.png';
+export const DefaultImage = '/mock_images/book.jpg';
 
 interface BookCardProps {
     book: IBook;

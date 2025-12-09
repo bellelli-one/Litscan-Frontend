@@ -142,6 +142,23 @@ export const deleteOrder = createAsyncThunk(
     }
 );
 
+// --- 8. (НОВОЕ) Решение модератора (Одобрить/Отклонить) ---
+// =========================================================
+export const resolveOrder = createAsyncThunk(
+    'orders/resolve',
+    async ({ id, action }: { id: number; action: 'complete' | 'reject' }, { rejectWithValue }) => {
+        try {
+            // Отправляем action ("complete" или "reject")
+            // Проверь в Api.ts точное название метода. Обычно это resolveUpdate.
+            await api.analysebooks.resolveUpdate(id, { action });
+            
+            return { id, action };
+        } catch (err: any) {
+            return rejectWithValue(err.response?.data?.description || 'Ошибка при смене статуса');
+        }
+    }
+);
+
 const ordersSlice = createSlice({
     name: 'orders',
     initialState,
@@ -196,6 +213,15 @@ const ordersSlice = createSlice({
             // Успешные операции (Form / Delete)
             .addCase(submitOrder.fulfilled, (state) => { state.operationSuccess = true; })
             .addCase(deleteOrder.fulfilled, (state) => { state.operationSuccess = true; })
+
+            .addCase(resolveOrder.fulfilled, (state, action) => {
+                // Обновляем статус локально в списке, чтобы не ждать перезагрузки
+                const found = state.list.find(item => item.id === action.payload.id);
+                if (found) {
+                    // 4 = Завершена, 5 = Отклонена
+                    found.status = action.payload.action === 'complete' ? 4 : 5;
+                }
+            })
             
             // Сброс при выходе
             .addCase(logoutUser.fulfilled, () => initialState);

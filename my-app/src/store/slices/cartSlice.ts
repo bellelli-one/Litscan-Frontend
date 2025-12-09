@@ -39,8 +39,8 @@ export const addBookToDraft = createAsyncThunk(
             dispatch(fetchCartBadge());
             return bookId;
         } catch (error: any) {
-            alert("Ошибка при добавлении: " + (error.response?.data?.description || "Неизвестная ошибка"));
-            return rejectWithValue('Failed to add');
+            const msg = error.response?.data?.description || "Failed to add";
+            return rejectWithValue(msg); 
         }
     }
 );

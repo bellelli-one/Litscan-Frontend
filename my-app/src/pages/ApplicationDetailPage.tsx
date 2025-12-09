@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Form, Button, Image } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, Button, Image, Badge } from 'react-bootstrap';
 import { useParams, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { 
@@ -9,15 +9,17 @@ import {
     removeBookFromOrder,
     submitOrder,
     deleteOrder,
+    resolveOrder, 
     resetOperationSuccess,
     clearCurrentOrder
-} from '../store/slices/analysebooksSlice';
-import { Trash, CheckCircleFill, BarChartLine, Floppy, ExclamationCircle } from 'react-bootstrap-icons';
+} from '../store/slices/analysebooksSlice'; 
+import { Trash, CheckCircleFill, BarChartLine, ExclamationCircle, XCircleFill } from 'react-bootstrap-icons';
 import type { AppDispatch, RootState } from '../store';
 import './styles/main.css';
 
-export const DefaultImage = 'mock_images/default-book.jpg';
+export const DefaultBook = '/mock_images/default-book.jpg';
 const STATUS_DRAFT = 1;
+const STATUS_FORMED = 3; 
 const STATUS_COMPLETED = 4;
 const STATUS_REJECTED = 5;
 
@@ -26,14 +28,16 @@ export const ApplicationDetailPage = () => {
     const dispatch = useDispatch<AppDispatch>();
     
     const { currentOrder, loading, operationSuccess } = useSelector((state: RootState) => state.orders);
-    
+    const { user } = useSelector((state: RootState) => state.user);
+    const isModerator = user?.moderator === true;
+
     const [formData, setFormData] = useState({
         avg_word_len: 0,
         lexical_diversity: 0,
         conjunction_freq: 0,
         avg_sentence_len: 0
     });
-    
+    const [saveMessage, setSaveMessage] = useState<string | null>(null);
     const [descriptions, setDescriptions] = useState<{[key: number]: string}>({});
 
     useEffect(() => {
@@ -63,12 +67,18 @@ export const ApplicationDetailPage = () => {
         }
     }, [currentOrder]);
 
+    const handleModeratorAction = (action: 'complete' | 'reject') => {
+        if (currentOrder?.id && window.confirm(`Вы уверены, что хотите ${action === 'complete' ? 'одобрить' : 'отклонить'} эту заявку?`)) {
+            dispatch(resolveOrder({ id: currentOrder.id, action }));
+        }
+    };
+
     if (operationSuccess) {
         return (
             <Container className="mt-5 pt-5 text-center">
                 <Card className="auth-card p-5 shadow-lg border-0 rounded-4">
                     <h2 className="text-dark mb-3 fw-bold" style={{ fontFamily: 'Josefin Sans' }}>Успешно!</h2>
-                    <p className="text-muted">Заявка была обновлена.</p>
+                    <p className="text-muted">Статус заявки был обновлен.</p>
                     <div className="d-flex justify-content-center gap-3 mt-4">
                         <Link to="/books"><Button variant="outline-dark">В каталог</Button></Link>
                         <Link to="/applications"><Button variant="dark">К списку заявок</Button></Link>
@@ -81,6 +91,7 @@ export const ApplicationDetailPage = () => {
     if (loading || !currentOrder) return <Container className="pt-5 text-center"><p>Загрузка...</p></Container>;
 
     const isDraft = currentOrder.status === STATUS_DRAFT;
+    const isFormed = currentOrder.status === STATUS_FORMED;
     const isCompleted = currentOrder.status === STATUS_COMPLETED;
     const isRejected = currentOrder.status === STATUS_REJECTED;
 
@@ -93,15 +104,17 @@ export const ApplicationDetailPage = () => {
     };
 
     const handleSaveMain = () => {
-        if(currentOrder.id) {
-            dispatch(updateOrderFields({ 
-                id: currentOrder.id, 
-                // @ts-ignore
-                data: formData 
-            }))
+        if(currentOrder?.id) {
+            dispatch(updateOrderFields({ id: currentOrder.id, data: formData }))
             .unwrap()
-            .then(() => alert("Параметры анализа сохранены!"))
-            .catch(() => alert("Ошибка при сохранении"));
+            .then(() => {
+                setSaveMessage("Успешно сохранено!");
+                setTimeout(() => setSaveMessage(null), 3000);
+            })
+            .catch(() => {
+                setSaveMessage("Ошибка сохранения");
+                setTimeout(() => setSaveMessage(null), 3000);
+            });
         }
     };
 
@@ -115,19 +128,6 @@ export const ApplicationDetailPage = () => {
         }
     };
 
-    const handleManualDescSave = (bookId: number) => {
-        if(currentOrder.id && descriptions[bookId] !== undefined) {
-            dispatch(updateBookDescription({
-                orderId: currentOrder.id,
-                bookId,
-                desc: descriptions[bookId]
-            }))
-            .unwrap()
-            .then(() => alert("Примечание к книге сохранено!"))
-            .catch(() => alert("Ошибка при сохранении примечания"));
-        }
-    };
-
     return (
         <Container className="pt-5 mt-5 pb-5">
             <Card className="auth-card border-0 shadow-sm mb-4">
@@ -135,7 +135,13 @@ export const ApplicationDetailPage = () => {
                     <h4 className="fw-bold m-0" style={{ fontFamily: 'Josefin Sans', textTransform: 'uppercase' }}>
                         Заявка #{currentOrder.id}
                     </h4>
-                    <p className="text-muted mb-0 mt-1">Статус: {isDraft ? 'Черновик' : isCompleted ? 'Готово' : 'В обработке'}</p>
+                    <p className="text-muted mb-0 mt-1">
+                        Статус: {
+                            isDraft ? 'Черновик' : 
+                            isFormed ? 'В обработке (На модерации)' : 
+                            isCompleted ? 'Одобрено' : 'Отклонено'
+                        }
+                    </p>
                 </Card.Body>
             </Card>
 
@@ -201,27 +207,19 @@ export const ApplicationDetailPage = () => {
                                     <BarChartLine size={48} className="text-success mb-3" />
                                     <h5 className="fw-bold text-success" style={{ fontFamily: 'Josefin Sans' }}>Анализ завершен</h5>
                                     
-                                    <div className="bg-white p-3 rounded border text-start mt-3 shadow-sm">
+                                    <div className="bg-white p-3 rounded border text-start mt-2 shadow-sm">
+                                        <h6 className="border-bottom pb-2 mb-3 text-muted small text-uppercase fw-bold" style={{ fontFamily: 'Josefin Sans' }}>
+                                            Результаты (Рассчитанные)
+                                        </h6>
                                         
-                                        {/* === ДОБАВЬ ВОТ ЭТОТ БЛОК === */}
-                                        <div className="text-center mb-3 pb-3 border-bottom">
-                                            <span className="d-block text-muted small text-uppercase mb-1" style={{fontFamily: 'Josefin Sans'}}>
-                                                Итоговый результат
-                                            </span>
-                                            <span className="fs-3 fw-bold text-success" style={{ fontFamily: 'Josefin Sans' }}>
-                                                {/* Выводим текст из базы (например: "Вероятность успеха: 71.39%") */}
-                                                {currentOrder.response || "Данные сохранены"}
-                                            </span>
-                                        </div>
-                                        {/* ============================ */}
-
-                                        <div className="d-flex justify-content-between mb-2 border-bottom pb-2">
-                                            <span className="text-muted small">Лекс. разнообразие:</span>
-                                            <strong>{currentOrder.lexical_diversity?.toFixed(2) || 0}</strong>
-                                        </div>
+                                        {/* ВОТ ТУТ ТЕПЕРЬ ВСЕ 4 МЕТРИКИ */}
                                         <div className="d-flex justify-content-between mb-2 border-bottom pb-2">
                                             <span className="text-muted small">Ср. длина слова:</span>
                                             <strong>{currentOrder.avg_word_len?.toFixed(2) || 0}</strong>
+                                        </div>
+                                        <div className="d-flex justify-content-between mb-2 border-bottom pb-2">
+                                            <span className="text-muted small">Лекс. разнообразие:</span>
+                                            <strong>{currentOrder.lexical_diversity?.toFixed(2) || 0}</strong>
                                         </div>
                                         <div className="d-flex justify-content-between mb-2 border-bottom pb-2">
                                             <span className="text-muted small">Частота союзов:</span>
@@ -240,22 +238,47 @@ export const ApplicationDetailPage = () => {
                                     <ExclamationCircle size={48} className="text-danger mb-3" />
                                     <h5 className="text-danger fw-bold" style={{ fontFamily: 'Josefin Sans' }}>Заявка отклонена</h5>
                                     <p className="text-muted">
-                                        Модератор отклонил эту заявку. <br/>
-                                        Проверьте список книг и примечания к ним на соответствие правилам.
+                                        Результаты анализа не соответствуют требованиям или были отклонены модератором.
                                     </p>
                                 </div>
                             )}
 
                             {!isCompleted && !isRejected && (
-                                <div>
+                                <div className="w-100">
                                     <BarChartLine size={48} className="text-secondary mb-3" />
-                                    <h5 className="fw-bold" style={{ fontFamily: 'Josefin Sans' }}>Ожидание обработки</h5>
+                                    <h5 className="fw-bold" style={{ fontFamily: 'Josefin Sans' }}>
+                                        {isFormed ? "На модерации" : "Ожидание формирования"}
+                                    </h5>
+                                    
                                     <p className="text-muted small">
                                         {isDraft 
-                                            ? "Сформируйте заявку, чтобы отправить её на анализ модератору." 
-                                            : "Заявка находится на проверке у модератора. Ожидайте результатов."
+                                            ? "Сформируйте заявку, чтобы запустить анализ." 
+                                            : "Анализ выполнен. Ожидайте решения модератора."
                                         }
                                     </p>
+
+                                    {/* === КНОПКИ ДЛЯ МОДЕРАТОРА === */}
+                                    {isModerator && isFormed && (
+                                        <div className="mt-4 border-top pt-3">
+                                            <p className="small fw-bold text-dark mb-2">Панель Модератора</p>
+                                            <div className="d-flex justify-content-center gap-2">
+                                                <Button 
+                                                    variant="success" 
+                                                    onClick={() => handleModeratorAction('complete')}
+                                                    className="d-flex align-items-center gap-2"
+                                                >
+                                                    <CheckCircleFill /> Одобрить
+                                                </Button>
+                                                <Button 
+                                                    variant="danger" 
+                                                    onClick={() => handleModeratorAction('reject')}
+                                                    className="d-flex align-items-center gap-2"
+                                                >
+                                                    <XCircleFill /> Отклонить
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             )}
 
@@ -264,83 +287,82 @@ export const ApplicationDetailPage = () => {
                 </Col>
             </Row>
 
+            {/* СПИСОК КНИГ */}
             <h5 className="fw-bold mb-3 mt-4" style={{ fontFamily: 'Josefin Sans' }}>Книги для анализа</h5>
             <div className="d-flex flex-column gap-3 mb-5">
-                {(currentOrder.books || []).length === 0 && (
-                    <div className="text-center text-muted py-5 border rounded bg-light">
-                        Список книг пуст.
-                    </div>
-                )}
-                
                 {currentOrder.books?.map((b) => (
-                    <Card key={b.book_id} className="border-0 shadow-sm overflow-hidden">
-                        <Card.Body className="p-0">
-                            <Row className="g-0">
-                                {/* Кола 1: Картинка */}
-                                <Col md={2} className="d-flex align-items-center justify-content-center bg-light p-3">
-                                    <div style={{ width: 70, height: 100, overflow: 'hidden', borderRadius: 4 }}>
-                                        <Image 
-                                            src={b.image || DefaultImage} 
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                        />
+                    <Card key={b.book_id} className="border-0 shadow-sm mb-3 overflow-hidden">
+                        <Card.Body className="p-3">
+                            <Row className="align-items-center g-4">
+                                <Col xs={12} md={2} className="text-center">
+                                    <div style={{ width: '100px', height: '140px', margin: '0 auto', overflow: 'hidden', borderRadius: '8px' }}>
+                                        <Image src={b.image || DefaultBook} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     </div>
                                 </Col>
-                                
-                                {/* Кола 2: Информация (БЕЗ КНОПКИ ПОДРОБНЕЕ) */}
-                                <Col md={6} className="p-3 border-end">
-                                    <h6 className="fw-bold m-0 mb-3">{b.title}</h6>
-                                    {/* Статистика */}
-                                    <div className="bg-light rounded p-2 mb-3">
-                                        <Row className="g-2 text-center">
-                                            <Col xs={3}><small className="d-block text-muted" style={{fontSize: '0.65rem'}}>Ср. дл. слова</small><strong>{b.avg_word_len?.toFixed(2) || '-'}</strong></Col>
-                                            <Col xs={3}><small className="d-block text-muted" style={{fontSize: '0.65rem'}}>Лекс. разн.</small><strong>{b.lexical_diversity?.toFixed(2) || '-'}</strong></Col>
-                                            <Col xs={3}><small className="d-block text-muted" style={{fontSize: '0.65rem'}}>Союзы</small><strong>{b.conjunction_freq?.toFixed(3) || '-'}</strong></Col>
-                                            <Col xs={3}><small className="d-block text-muted" style={{fontSize: '0.65rem'}}>Предлож.</small><strong>{b.avg_sentence_len?.toFixed(2) || '-'}</strong></Col>
-                                        </Row>
+                                <Col xs={12} md={5}>
+                                    <h5 className="fw-bold mb-3" style={{ fontFamily: 'Josefin Sans' }}>{b.title}</h5>
+                                    
+                                    {/* ВОТ ТУТ ТЕПЕРЬ ТОЖЕ 4 МЕТРИКИ */}
+                                    <div className="d-flex flex-wrap gap-3 mb-3">
+                                        <div className="bg-light rounded p-2 text-center" style={{ minWidth: '80px' }}>
+                                            <small className="d-block text-muted" style={{ fontSize: '0.7rem' }}>Ср. дл. слова</small>
+                                            <span className="fw-bold">{b.avg_word_len?.toFixed(2) || '-'}</span>
+                                        </div>
+                                        <div className="bg-light rounded p-2 text-center" style={{ minWidth: '80px' }}>
+                                            <small className="d-block text-muted" style={{ fontSize: '0.7rem' }}>Лекс. разн.</small>
+                                            <span className="fw-bold">{b.lexical_diversity?.toFixed(2) || '-'}</span>
+                                        </div>
+                                        <div className="bg-light rounded p-2 text-center" style={{ minWidth: '80px' }}>
+                                            <small className="d-block text-muted" style={{ fontSize: '0.7rem' }}>Союзы</small>
+                                            <span className="fw-bold">{b.conjunction_freq?.toFixed(3) || '-'}</span>
+                                        </div>
+                                        <div className="bg-light rounded p-2 text-center" style={{ minWidth: '80px' }}>
+                                            <small className="d-block text-muted" style={{ fontSize: '0.7rem' }}>Предлож.</small>
+                                            <span className="fw-bold">{b.avg_sentence_len?.toFixed(1) || '-'}</span>
+                                        </div>
                                     </div>
-                                    <div className="d-flex gap-2">
-                                        {/* Кнопка "Подробнее" УДАЛЕНА */}
-                                        
-                                        {isDraft && (
-                                            <Button 
-                                                variant="outline-danger" 
-                                                size="sm"
-                                                onClick={() => dispatch(removeBookFromOrder({ orderId: currentOrder.id!, bookId: b.book_id! }))}
-                                            >
-                                                <Trash /> Удалить
-                                            </Button>
-                                        )}
-                                    </div>
-                                </Col>
 
-                                {/* Кола 3: Примечание */}
-                                <Col md={4} className="p-3 bg-white">
-                                    <Form.Group>
-                                        <Form.Label className="small text-muted mb-1">Примечание</Form.Label>
-                                        <Form.Control
-                                            as="textarea"
-                                            rows={3}
-                                            value={descriptions[b.book_id!] || ''}
-                                            onChange={(e) => setDescriptions(prev => ({ ...prev, [b.book_id!]: e.target.value }))}
-                                            onBlur={() => handleDescBlur(b.book_id!)}
-                                            disabled={!isDraft}
-                                            className="bg-light border-0 mb-2"
-                                            style={{ resize: 'none', fontSize: '0.9rem' }}
-                                        />
-                                    </Form.Group>
-
-                                    {isDraft && (
-                                        <div className="text-end">
-                                            <Button 
-                                                variant="outline-success" 
-                                                size="sm" 
-                                                className="d-inline-flex align-items-center gap-1"
-                                                onClick={() => handleManualDescSave(b.book_id!)}
-                                            >
-                                                <Floppy size={14} /> Сохранить
-                                            </Button>
+                                    {/* БЕЙДЖИК ВЕРОЯТНОСТИ ДЛЯ КНИГИ */}
+                                    {isCompleted && b.similarity !== undefined && b.similarity !== null && (
+                                        <div className="mb-3">
+                                            <Badge bg={b.similarity > 0.6 ? "success" : "warning"} className="p-2 fw-normal">
+                                                Совпадение: {(b.similarity * 100).toFixed(1)}%
+                                            </Badge>
                                         </div>
                                     )}
+
+                                    {isDraft && (
+                                        <Button 
+                                            variant="outline-danger" size="sm" className="d-flex align-items-center gap-2"
+                                            onClick={() => dispatch(removeBookFromOrder({ orderId: currentOrder.id!, bookId: b.book_id! }))}
+                                        >
+                                            <Trash /> Удалить из заявки
+                                        </Button>
+                                    )}
+                                </Col>
+                                <Col xs={12} md={5} className="d-flex flex-column">
+                                    <Form.Group className="flex-grow-1 d-flex flex-column">
+                                        <Form.Label className="small text-muted mb-1" style={{ fontFamily: 'Josefin Sans' }}>Примечание</Form.Label>
+                                        <Form.Control
+                                            as="textarea" rows={3} placeholder="Напишите комментарий..."
+                                            value={descriptions[b.book_id!] || ''}
+                                            onChange={(e) => setDescriptions(prev => ({ ...prev, [b.book_id!]: e.target.value }))}
+                                            disabled={!isDraft}
+                                            className="bg-light border-0 flex-grow-1 mb-2"
+                                            style={{ resize: 'none', fontSize: '0.9rem' }}
+                                        />
+                                        {isDraft && (
+                                            <div className="text-end">
+                                                <Button 
+                                                    variant="outline-success" size="sm"
+                                                    onClick={() => handleDescBlur(b.book_id!)}
+                                                    style={{ fontFamily: 'Josefin Sans' }}
+                                                >
+                                                    <CheckCircleFill className="me-2"/> Сохранить
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </Form.Group>
                                 </Col>
                             </Row>
                         </Card.Body>
@@ -361,6 +383,11 @@ export const ApplicationDetailPage = () => {
                                 }}>
                                     Удалить
                                 </Button>
+                                {saveMessage && (
+                                    <span className={`small fw-bold ${saveMessage.includes('Ошибка') ? 'text-danger' : 'text-success'}`}>
+                                        {saveMessage}
+                                    </span>
+                                )}
                             </Col>
                             <Col xs={12} md={6} className="text-md-end">
                                  <Button 

@@ -19,6 +19,8 @@ export interface DsAnalyseBooksDTO {
   avg_sentence_len?: number;
   avg_word_len?: number;
   books?: DsBookInApplicationDTO[];
+  /** Сколько посчитано (Similarity != nil) */
+  calculated_books?: number;
   completion_date?: string;
   conjunction_freq?: number;
   creation_date?: string;
@@ -27,8 +29,8 @@ export interface DsAnalyseBooksDTO {
   id?: number;
   lexical_diversity?: number;
   moderator_login?: number;
-  response?: string;
   status?: number;
+  total_books?: number;
 }
 
 export interface DsAnalyseBooksResolveRequest {
@@ -40,12 +42,12 @@ export interface DsAnalyseBooksUpdateRequest {
   avg_sentence_len?: number;
   /** Новые поля метрик */
   avg_word_len?: number;
+  book_results?: DsBookResultDTO[];
   completion_date?: string;
   conjunction_freq?: number;
   forming_date?: string;
   lexical_diversity?: number;
   moderator?: boolean;
-  response?: string;
   status?: number;
 }
 
@@ -79,8 +81,14 @@ export interface DsBookInApplicationDTO {
   description?: string;
   image?: string;
   lexical_diversity?: number;
+  similarity?: number;
   text?: string;
   title?: string;
+}
+
+export interface DsBookResultDTO {
+  book_id?: number;
+  similarity?: number;
 }
 
 export interface DsBookToApplicationUpdateRequest {
