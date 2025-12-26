@@ -1,8 +1,8 @@
 // config.ts
 
 // IP вашего Go бэкенда.
-const BACKEND_IP = 'http://192.168.1.151:8090'; 
-const MINIO_IP = 'http://192.168.1.151:9000';
+const BACKEND_IP = 'http://192.168.74.1:8090'; 
+const MINIO_IP = 'http://192.168.74.1:9000';
 
 export const getApiBase = (): string => {
     // Vite предоставляет надежный флаг import.meta.env.DEV

@@ -15,11 +15,11 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://192.168.1.151:8090',
+        target: 'http://192.168.74.1:8090',
         changeOrigin: true, 
       },
       '/img': {
-        target: 'http://192.168.1.151:9000',
+        target: 'http://192.168.74.1:9000',
         changeOrigin: true,
         secure: false,
         rewrite: (path: string)  => path.replace(/^\/img/, ''),
